@@ -11,6 +11,10 @@ class userController {
                return res.status(400).send({message: "All fields are required!!"})
            }
            
+           if (password.length < 8) {
+               return res.status(400).send({ message: "Password must be at least 8 characters" });
+           }
+
            password = await bcrypt.hash(password,10)
 
            const user = await User.create({ name, surname, username, password })
@@ -43,9 +47,68 @@ class userController {
                 { expiresIn:"7d"}
             )
 
-            return res.status(201).send({ok: true, token})
+            return res.status(201).send({ok: true, token, user})
         }catch(err){
             return res.status(400).send({message: err.message})
+        }
+    }
+
+    async getUser(req,res){
+        try{
+            const { id } = req.params 
+
+            const user = await User.findById(id).select("-password")
+            if(!user){
+                return res.status(400).send({message:"User not found"})
+            }
+
+            return res.status(201).send({ok: true,  user})
+        }catch(err){
+            return res.status(400).send({message: err.message})
+        }
+    }
+
+    async update(req,res){
+        try{
+          const { name, surname, username, password } = req.body
+          const { id } = req.params
+
+          const user = await User.findById(id)
+          if(!user){
+            return res.status(400).send({message: "User is not found"})
+          }
+
+          if(name) user.name = name
+          if(surname) user.surname = surname
+          if(username) user.username = username
+          if(password) user.password = password
+
+          await user.save()
+          return res.status(201).send({ok: true, user})
+        }catch(err){
+            return res.status(400).send({message: err.message})
+        }
+    }
+
+    async searchUser(req,res){
+        try{
+           const { q } = req.query
+           if(!q){
+              return res.status(400).send({message: "Query parameter required "})
+           }
+   
+           const users = await User.find({
+                $or: [
+                    { name: { $regex: q, $options: "i"}},
+                    { surname: { $regex: q, $options: "i"}},
+                    { username: { $regex: q, $options: "i"}}
+                ],
+           }).limit(5)
+
+           return res.status(201).send({ ok: true, users})
+
+        }catch(err){
+            return send.status(400).send({message: err.message})
         }
     }
 }

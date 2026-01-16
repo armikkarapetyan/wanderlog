@@ -21,9 +21,9 @@ class tripController {
             }catch(err){
                 return res.status(400).send({message: err.message})
             }
-        }
+    }
 
-    async getTrips(req,res){
+    async getTrips(req,res){//errrooooor
         try{
            const trips = await Trip.find({user: req.user._id})
 
@@ -40,10 +40,6 @@ class tripController {
             const trip = await Trip.findById(id)
             if(!trip){
                 return res.status(400).send({message: "Trip doesnot exist"})
-            }
-
-            if(trip.user.toString() !== req.user._id.toString()){
-                return res.status(400).send({message: "Not authorized"})
             }
 
             res.status(200).send({ok: true, trip})
