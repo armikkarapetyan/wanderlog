@@ -45,6 +45,10 @@ class userController {
                 return res.status(401).send({message: "User is not found!"})
             }
 
+            if (user.provider === "google") {
+                return res.status(401).send({ message: "Use Google login for this account" });
+            }
+
             const valid = await bcrypt.compare(password, user.password)
             if(!valid){
                 return res.status(401).send({message: "Invalid credentials!"})

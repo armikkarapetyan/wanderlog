@@ -16,7 +16,13 @@ import rateLimit from "express-rate-limit";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.js";
 
+import passport from "passport";
+import "./config/passport.js";
+import authRoutes from "./routes/auth.js"
+
 const app = express()
+
+app.use(passport.initialize());
 
 // Security middleware
 app.use(helmet({
@@ -48,13 +54,14 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     customSiteTitle: "Wanderlog API Documentation"
 }))
 
-app.use("/auth", userRouter)
+app.use("/user", userRouter)
 app.use("/trips", tripRouter)
 app.use("/destinations", destinationRouter)
 app.use("/journals", journalRouter)
 app.use("/photos",  photoRouter)
 app.use("/comments", commentRouter)
 app.use("/api", hotelRouter)
+app.use("/auth", authRoutes);
 
 // 404 handler
 app.use((req, res) => {
