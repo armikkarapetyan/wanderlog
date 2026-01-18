@@ -1,9 +1,8 @@
-import { Schema, model } from 'mongoose'
+import mongoose, { Schema, model } from 'mongoose'
 
 const userSchema = new Schema({
     email: { 
-        type: String,
-        required: true, 
+        type: String, 
         unique: true 
     },
     name: { 
@@ -28,6 +27,8 @@ const userSchema = new Schema({
         type: String, 
         default: 'local' 
     },
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
 }, {timestamps: true})
 
 export default model("User", userSchema)

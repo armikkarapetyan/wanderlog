@@ -15,6 +15,8 @@ import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.js";
+import FollowRouter from "./routes/follow.js";
+
 
 import passport from "passport";
 import "./config/passport.js";
@@ -55,13 +57,15 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 }))
 
 app.use("/user", userRouter)
+app.use("/users", FollowRouter)
 app.use("/trips", tripRouter)
 app.use("/destinations", destinationRouter)
 app.use("/journals", journalRouter)
 app.use("/photos",  photoRouter)
 app.use("/comments", commentRouter)
 app.use("/api", hotelRouter)
-app.use("/auth", authRoutes);
+app.use("/auth", authRoutes)
+
 
 // 404 handler
 app.use((req, res) => {

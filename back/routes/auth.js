@@ -2,17 +2,55 @@ import express from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 
-const router = express.Router()
+const router = express.Router();
 
-// Redirect to Google
+/**
+ * @swagger
+ * /auth/google:
+ *   get:
+ *     summary: Redirects user to Google for login
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: Redirect to Google login page
+ */
 router.get(
   "/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
   })
-)
+);
 
-// Google callback
+/**
+ * @swagger
+ * /auth/google/callback:
+ *   get:
+ *     summary: Google OAuth callback
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Successful login with Google
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 token:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     provider:
+ *                       type: string
+ */
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
@@ -21,16 +59,15 @@ router.get(
       { id: req.user._id },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
-    )
+    );
 
-     res.json({
+    res.json({
       message: "Google login successful",
       token,
       user: req.user
-    })
-    // Redirect back to frontend with token
-    //res.redirect(`http://localhost:5173/login-success?token=${token}`)
+    });
   }
-)
+);
 
-export default router
+export default router;
+
